@@ -33,3 +33,17 @@ elif quote2 == "no":
         print("Wow! So cool")
     elif quote2b == "no":
         print("I guess you cant trust whatever you hear. Too bad.")
+
+quote3 = input("So what do you want to talk about?\n").lower()
+while quote3 != "goodbye":
+    if quote3 == "nothing":
+        print("well thats boring\n")
+    elif quote3 == "yes" or quote3 == "no":
+        print("youre so right\n")
+    elif "beep" in quote3 or "boop" in quote3:
+        print("are you mocking me?")
+    else:
+        print("I dont understand ):\n")
+    quote3 = input("").lower()
+
+print("goodbye")
