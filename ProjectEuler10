@@ -1,0 +1,18 @@
+import math
+
+def isPrime(num):
+    i: int = 2
+    while i<=math.sqrt(num):
+        if num % i == 0:
+            return False
+        i=i+1
+    return True
+
+sum: int = 0
+n: int = 2
+while n<2000000:
+    if isPrime(n):
+        sum = sum+n
+        #print(n)
+    n=n+1
+print(sum)
