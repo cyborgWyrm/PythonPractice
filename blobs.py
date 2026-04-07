@@ -10,56 +10,9 @@ breeding instead of mitosis
 # imports
 import random
 import time
+from Blob import Blob
 
-# blobs are creatures with the ability to eat, reproduce, and die
-# their genetics change how they function
-class Blob:
-    mature: bool = False
-    agression: bool = False
-    food: float = 1
-    fed: bool = False
 
-    def __init__(self,agression):
-        self.agression = agression
-    
-    def feed(self,amount):
-        # blobs will not eat food when already fed
-        #print(self.fed)
-        if self.fed == False:
-            self.food = self.food+amount
-            self.mature = True
-            self.fed = True
-
-    def reproduce(self):
-        return Blob(self.agression)
-
-    def die(self):
-        self = None
-
-# function that controls what happens when two blobs meet to feed
-# an agressive blob meeting a peaceful blob gets 2 food, while the peaceful blob gets none
-# peaceful blobs meeting get 1.5 food each
-# agressive blobs meeting get 0.5 food each
-def eat(blob0,blob1):
-    if blob0==None:
-        if blob1!=None:
-            blob1.feed(1)
-    elif blob1==None:
-        blob0.feed(1)
-
-    elif blob0.agression==False:
-        if blob1.agression==False:
-            blob0.feed(1.5)
-            blob1.feed(1.5)
-        elif blob1.agression==True:
-            blob1.feed(3)
-    
-    elif blob0.agression==True:
-        if blob1.agression==False:
-            blob0.feed(3)
-        elif blob1.agression==True:
-            blob0.feed(0.5)
-            blob1.feed(0.5)
 
 # checks if all blobs have been fed (returns False if there are more than 1 unfed blobs)
 def allFed():
@@ -88,6 +41,15 @@ def getHungryBlob(notThisOne: Blob):
         return getHungryBlob(notThisOne)
     return hungryBlobs[num]
 
+def averageFood():
+    sum = 0
+    for blob in blobs:
+        sum = sum + blob.food
+    return sum/len(blobs)
+
+waitTime = 1
+endDay = None
+
 # ---------Script!!!-----------
 # creates an array of new blobs with random genes
 blobs = []
@@ -102,7 +64,7 @@ while i<200:
     i=i+1
 
 # runs until there is only one blob left
-while len(blobs)>1:
+while len(blobs)>1 and (endDay==None or day<endDay):
     # set blob fed states to False
     for blob in blobs:
         blob.fed = False
@@ -112,7 +74,9 @@ while len(blobs)>1:
     while foods>0 and allFed()==False:
         blob1=getHungryBlob(None)
         blob2=getHungryBlob(blob1)
-        eat(blob1,blob2)
+        if blob1!=None and blob2!=None and (blob1.fed==True or blob2.fed==True):
+            print("---------this is bad--------")
+        Blob.eat(blob1,blob2)
         foods = foods-3
         #print(allFed())
     
@@ -134,10 +98,11 @@ while len(blobs)>1:
     
     # print update
     print(f"There are {len(blobs)} blobs")
+    print(f"They have {averageFood()} food on average")
     agressiveBlobs=0
     for blob in blobs:
         if blob.agression:
             agressiveBlobs = agressiveBlobs+1
     print(f"{agressiveBlobs} of them are agressive, {len(blobs)-agressiveBlobs} are not")
-    time.sleep(1)
+    time.sleep(waitTime)
 
