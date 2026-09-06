@@ -11,7 +11,7 @@ breeding instead of mitosis
 import random
 import time
 from Blob import Blob
-
+from pynput import keyboard
 
 
 # checks if all blobs have been fed (returns False if there are more than 1 unfed blobs)
@@ -47,35 +47,18 @@ def averageFood():
         sum = sum + blob.food
     return sum/len(blobs)
 
-waitTime = 1
-endDay = None
-
-# ---------Script!!!-----------
-# creates an array of new blobs with random genes
-blobs = []
-i = 0
-while i<200:
-    num = random.randint(0,1)
-    agressive: bool = False
-    if num==0:
-        agressive=True
-    newBlob = Blob(agressive)
-    blobs.append(newBlob)
-    i=i+1
-
-# runs until there is only one blob left
-while len(blobs)>1 and (endDay==None or day<endDay):
+def run():
     # set blob fed states to False
     for blob in blobs:
         blob.fed = False
     
     # feed blobs until they have all eaten
-    foods = 100
+    foods = initialFood
     while foods>0 and allFed()==False:
         blob1=getHungryBlob(None)
         blob2=getHungryBlob(blob1)
         if blob1!=None and blob2!=None and (blob1.fed==True or blob2.fed==True):
-            print("---------this is bad--------")
+            print("---------A BLOB IS CHEATING!--------")
         Blob.eat(blob1,blob2)
         foods = foods-3
         #print(allFed())
@@ -95,6 +78,58 @@ while len(blobs)>1 and (endDay==None or day<endDay):
             blob.food = blob.food-2
             blobs.append(blob.reproduce())
         index=index+1
+
+def runToInfinity():
+    average = len(blobs)
+    i=0
+    while i<1:
+        i=i+1
+        run()
+        average = (average + len(blobs))/2
+
+    if abs(average-len(blobs)) < 5:
+        print(f"stable at about {average}\n\n\n")
+    else:
+        print("not stable\n\n\n")
+    endDay = True
+
+
+
+waitTime = 1
+endDay = False
+
+# ---------Script!!!-----------
+# asks user for information
+initialBlobNum = int(input("How many blobs initially exist? "))
+initialFood = int(input("How much food is avaliable? "))
+
+
+# creates an array of new blobs with random genes
+blobs = []
+i = 0
+while i<initialBlobNum:
+    num = random.randint(0,2)
+    agressive: bool = False
+    if num==0:
+        agressive=True
+    newBlob = Blob(agressive)
+    blobs.append(newBlob)
+    i=i+1
+
+def on_key_press(key):
+    if hasattr(key, "char") and key.char == "s":
+        runToInfinity()
+keyboard_listener = keyboard.Listener(
+    on_press=on_key_press)
+# start the listener
+keyboard_listener.start()
+
+# runs until there is only one blob left
+while len(blobs)>1 and (endDay == False):
+
+    # run a day for blobs
+    run()
+
     
     # print update
     print(f"There are {len(blobs)} blobs")
@@ -105,4 +140,3 @@ while len(blobs)>1 and (endDay==None or day<endDay):
             agressiveBlobs = agressiveBlobs+1
     print(f"{agressiveBlobs} of them are agressive, {len(blobs)-agressiveBlobs} are not")
     time.sleep(waitTime)
-
